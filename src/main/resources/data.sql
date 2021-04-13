@@ -1,0 +1,14 @@
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Andrés', 'Guzmán', 'profesor@bolsaideas.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Jorge', 'Martin', 'jmdecerio@gmail.com', '2021-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Pepito', 'Piscinas', 'pepito@gmail.com', '2019-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Sandra', 'Salinas', 'sandra.salinas@bolsaideas.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Berta', 'Romero', 'berta.romero@gmail.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Alfonso', 'Diaz', 'alfonso.diaz@bolsaideas.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Pedro', 'Gonzalez', 'pedro.gonzalez@gmail.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Isidro', 'Cantares', 'isidro.cantares@gmail.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Amelia', 'Herrera', 'amelia@hotmail.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Eva', 'Ibarrola', 'eva.ibarrola@bolsaideas.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Paco', 'Rojo', 'paco.rojo@bolsaideas.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Alberto', 'Fernandez', 'alberto.fernandez@hotmail.com', '2018-01-01');
+INSERT INTO clientes(nombre, apellido, email, created_at) VALUES ('Luis', 'Machichaco', 'luis@bolsaideas.com', '2018-01-01');
+COMMIT;
