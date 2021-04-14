@@ -2,9 +2,10 @@ package com.bolsadeideas.springboot.backend.apirest.models.services;
 
 import com.bolsadeideas.springboot.backend.apirest.models.dao.IClienteDao;
 import com.bolsadeideas.springboot.backend.apirest.models.entity.Cliente;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,12 @@ public class ClienteService implements IClienteService {
     @Transactional(readOnly = true)
     public List<Cliente> findAll() {
         return (List<Cliente>) clienteDao.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Cliente> findAll(Pageable pageable) {
+        return clienteDao.findAll(pageable);
     }
 
     @Override
