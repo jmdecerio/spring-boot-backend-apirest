@@ -111,7 +111,7 @@ public class ClienteRestController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        response.put("mensaje", "El cliente ha sido actualizado con exito");
+        response.put("mensaje", "El cliente ha sido eliminado con exito");
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
