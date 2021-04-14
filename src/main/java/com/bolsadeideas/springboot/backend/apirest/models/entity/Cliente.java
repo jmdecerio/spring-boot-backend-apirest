@@ -1,7 +1,6 @@
 package com.bolsadeideas.springboot.backend.apirest.models.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,8 +15,10 @@ public class Cliente implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String nombre;
     private String apellido;
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(name = "created_at")
