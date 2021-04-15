@@ -41,6 +41,8 @@ public class Cliente implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private OffsetDateTime createdAt;
 
+    private String foto;
+
 //    @PrePersist
 //    public void prepersist() {
 //        createdAt = new Date();

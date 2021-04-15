@@ -11,11 +11,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -125,6 +132,18 @@ public class ClienteRestController {
         Map<String, Object> response = new HashMap<>();
 
         try {
+
+            Cliente cliente = clienteService.findById(id);
+            String nombreArchivoAnterior = cliente.getFoto();
+
+            if (nombreArchivoAnterior != null && nombreArchivoAnterior.length() > 0) {
+                Path rutaArchivoAnterior = Paths.get("uploads").resolve(nombreArchivoAnterior).toAbsolutePath();
+                File archivoAnterior = rutaArchivoAnterior.toFile();
+                if (archivoAnterior.exists() && archivoAnterior.canRead()) {
+                    archivoAnterior.delete();
+                }
+            }
+
             clienteService.delete(id);
         } catch (DataAccessException e) {
             response.put("mensaje", "Error al eliminar cliente en la base de datos");
@@ -135,6 +154,39 @@ public class ClienteRestController {
         response.put("mensaje", "El cliente ha sido eliminado con exito");
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/clientes/upload")
+    public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        Cliente cliente = clienteService.findById(id);
+
+        if (!archivo.isEmpty()) {
+            String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename().replace(" ", "");
+            Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
+            try {
+                Files.copy(archivo.getInputStream(), rutaArchivo);
+            } catch (IOException e) {
+                response.put("mensaje", "Error al subir la imagen al filesystem");
+                response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
+                return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            String nombreArchivoAnterior = cliente.getFoto();
+            if (nombreArchivoAnterior != null && nombreArchivoAnterior.length() > 0) {
+                Path rutaArchivoAnterior = Paths.get("uploads").resolve(nombreArchivoAnterior).toAbsolutePath();
+                File archivoAnterior = rutaArchivoAnterior.toFile();
+                if (archivoAnterior.exists() && archivoAnterior.canRead()) {
+                    archivoAnterior.delete();
+                }
+            }
+
+            cliente.setFoto(nombreArchivo);
+            clienteService.save(cliente);
+            response.put("mensaje", "Foto subida con exito: " + nombreArchivo);
+            response.put("cliente", cliente);
+        }
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
 
