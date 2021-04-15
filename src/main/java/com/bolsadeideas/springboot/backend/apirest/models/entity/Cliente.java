@@ -1,14 +1,17 @@
 package com.bolsadeideas.springboot.backend.apirest.models.entity;
 
+import com.bolsadeideas.springboot.backend.apirest.formater.CustomJsonOffsetDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @Data
 @Entity
@@ -32,13 +35,14 @@ public class Cliente implements Serializable {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "created_at")
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date createdAt;
+    @NotNull(message = "no puede estar vacia")
+    @JsonDeserialize(using = CustomJsonOffsetDateTimeDeserializer.class)
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private OffsetDateTime createdAt;
 
-    @PrePersist
-    public void prepersist() {
-        createdAt = new Date();
-    }
+//    @PrePersist
+//    public void prepersist() {
+//        createdAt = new Date();
+//    }
 }
