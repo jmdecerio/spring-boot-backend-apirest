@@ -2,6 +2,7 @@ package com.bolsadeideas.springboot.backend.apirest.controllers;
 
 import com.bolsadeideas.springboot.backend.apirest.models.entity.Cliente;
 import com.bolsadeideas.springboot.backend.apirest.models.services.ClienteService;
+import com.bolsadeideas.springboot.backend.apirest.models.services.UploadFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 public class ClienteRestController {
 
     private final ClienteService clienteService;
+    private final UploadFileService uploadFileService;
 
     @GetMapping("/clientes")
     public List<Cliente> index() {
@@ -140,15 +142,10 @@ public class ClienteRestController {
             Cliente cliente = clienteService.findById(id);
             String nombreArchivoAnterior = cliente.getFoto();
 
-            if (nombreArchivoAnterior != null && nombreArchivoAnterior.length() > 0) {
-                Path rutaArchivoAnterior = Paths.get("uploads").resolve(nombreArchivoAnterior).toAbsolutePath();
-                File archivoAnterior = rutaArchivoAnterior.toFile();
-                if (archivoAnterior.exists() && archivoAnterior.canRead()) {
-                    archivoAnterior.delete();
-                }
-            }
+            uploadFileService.eliminar(nombreArchivoAnterior);
 
             clienteService.delete(id);
+
         } catch (DataAccessException e) {
             response.put("mensaje", "Error al eliminar cliente en la base de datos");
             response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
@@ -167,27 +164,22 @@ public class ClienteRestController {
         Cliente cliente = clienteService.findById(id);
 
         if (!archivo.isEmpty()) {
-            String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename().replace(" ", "");
-            Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
-            log.info(rutaArchivo.toString());
+
+            String nombreArchivo = null;
             try {
-                Files.copy(archivo.getInputStream(), rutaArchivo);
+                nombreArchivo = uploadFileService.copiar(archivo);
             } catch (IOException e) {
-                response.put("mensaje", "Error al subir la imagen al filesystem");
+                response.put("mensaje", "Error al subir la imagen del cliente");
                 response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
-                return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
             }
+
             String nombreArchivoAnterior = cliente.getFoto();
-            if (nombreArchivoAnterior != null && nombreArchivoAnterior.length() > 0) {
-                Path rutaArchivoAnterior = Paths.get("uploads").resolve(nombreArchivoAnterior).toAbsolutePath();
-                File archivoAnterior = rutaArchivoAnterior.toFile();
-                if (archivoAnterior.exists() && archivoAnterior.canRead()) {
-                    archivoAnterior.delete();
-                }
-            }
+            uploadFileService.eliminar(nombreArchivoAnterior);
 
             cliente.setFoto(nombreArchivo);
             clienteService.save(cliente);
+
             response.put("mensaje", "Foto subida con exito: " + nombreArchivo);
             response.put("cliente", cliente);
         }
@@ -196,16 +188,13 @@ public class ClienteRestController {
 
     @GetMapping("/uploads/img/{nombreFoto:.+}")
     public ResponseEntity<Resource>  verFoto(@PathVariable  String nombreFoto) {
-        Path rutaArchivo = Paths.get("uploads").resolve(nombreFoto).toAbsolutePath();
-        log.info(rutaArchivo.toString());
+
         Resource recurso = null;
+
         try {
-            recurso = new UrlResource(rutaArchivo.toUri());
+            recurso = uploadFileService.cargar(nombreFoto);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        }
-        if (!recurso.exists() && !recurso.isReadable()) {
-            throw new RuntimeException("Error no se pudo cargar la imagen");
         }
 
         //Cabecera que permite utilizar recurso en pagina con src
