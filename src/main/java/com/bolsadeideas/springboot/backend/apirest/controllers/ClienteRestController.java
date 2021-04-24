@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8081"})
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -205,7 +205,13 @@ public class ClienteRestController {
             e.printStackTrace();
         }
         if (!recurso.exists() && !recurso.isReadable()) {
-            throw new RuntimeException("Error no se pudo cargar la imagen");
+            rutaArchivo = Paths.get("src/main/resources/static/images").resolve("nousuario.png").toAbsolutePath();
+            try {
+                recurso = new UrlResource(rutaArchivo.toUri());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            log.error("Error no se pudo cargar la imagen");
         }
 
         //Cabecera que permite utilizar recurso en pagina con src
