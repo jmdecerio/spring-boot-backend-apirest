@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:4200"})
+@CrossOrigin(origins = {"${settings.cors_origin[0]}", "${settings.cors_origin[1]}"} )
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
